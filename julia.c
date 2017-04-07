@@ -88,7 +88,8 @@ julia_thread(void *arg)
         rep.x = req.x;
         rep.y = req.y;
         rep.count = req.count;
-        for(int i = 0; i < req.count; i++) {
+        int i;
+        for(i = 0; i < req.count; i++) {
             rep.data[i] = julia(toc(req.x + i, rep.y), julia_c);
         }
         rc = conduct_write(cons.two, &rep, sizeof(rep));
@@ -142,8 +143,8 @@ paintit(struct twocons *cons, cairo_t *cr, int repcount)
     cairo_surface_t *surface;
     unsigned *data;
     unsigned rgb;
-
-    for(int i = 0; i < repcount; i++) {
+    int i;
+    for(i= 0; i < repcount; i++) {
         struct julia_reply rep;
         int rc;
         rc = conduct_read(cons->two, &rep, sizeof(rep));
@@ -155,7 +156,8 @@ paintit(struct twocons *cons, cairo_t *cr, int repcount)
            pixel.  Pas grave, on va travailler en mémoire principale. */
         surface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, rep.count, 1);
         data = (unsigned*)cairo_image_surface_get_data(surface);
-        for(int j = 0; j < rep.count; j++) {
+        int j;
+        for(j = 0; j < rep.count; j++) {
             int n = rep.data[j];
             if(n >= ITERATIONS) {
                 rgb = 0;
@@ -185,9 +187,10 @@ draw_callback (GtkWidget *widget, cairo_t *cr, gpointer data)
     cairo_clip_extents(cr, &x1, &y1, &x2, &y2);
 
     clock_gettime(CLOCK_MONOTONIC, &t0);
-
-    for(int j = y1; j <= y2; j++) {
-        for(int i = x1; i <= x2; i += COUNT) {
+    int j;
+    for(j = y1; j <= y2; j++) {
+      int i;
+        for(i = x1; i <= x2; i += COUNT) {
             struct julia_request req;
             req.x = i;
             req.y = j;
@@ -303,8 +306,8 @@ int main(int argc, char **argv)
         exit(1);
     }
     printf("Running %d worker threads.\n", numthreads);
-
-    for(int i = 0; i < numthreads; i++) {
+    int i;
+    for(i = 0; i < numthreads; i++) {
         pthread_t t;
         rc = pthread_create(&t, NULL, julia_thread, &cons);
         if(rc != 0) {
