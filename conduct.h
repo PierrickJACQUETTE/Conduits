@@ -10,19 +10,28 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <pthread.h>
+#include <stdbool.h>
 
 #define ERROR(a,str) if (a < 0 && errno != 0) {perror(str); exit(0);}
 #define ERROR_MMAP(a) if (a == MAP_FAILED && errno != 0) {perror("mmap failed"); exit(0);}
 #define ERROR_MALLOC(a, str) if(a == NULL && errno != 0){perror(str); exit(0);}
+#define ERROR_THREAD(a,str) if(a !=0){perror(str); exit(0);}
 #define TMP "/tmp/"
 
 struct conduct {
   const void* name;
-  size_t c; //capacité
-  size_t a; //atomicité si a<=c
   void* retourMmap; //pour destroy
-  int fd; //file descriptor
+  size_t capacite; //capacité
+  size_t a; //atomicité si a<=c
   size_t sizeFstat; //sizeFstat
+  int fd; //file descriptor
+  size_t contenu;
+  size_t teteDeLecture;
+  bool eof;
+  pthread_mutex_t verrou;
+  pthread_cond_t aEcrit;
+  pthread_cond_t aLu;
 };
 
 struct conduct *conduct_create(const char *name, size_t a, size_t c);
