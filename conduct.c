@@ -8,7 +8,7 @@ struct conduct *conduct_create(const char *name, size_t a, size_t c){
   //si anonyme
   if(name == NULL){
     //ou alors PROT_NONE pour la rendre inaccessible
-    src = mmap(NULL, c, PROT_READ|PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    src = mmap(NULL, c, PROT_READ|PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     ERROR_MMAP(src);
     cond->name = name;
     cond->capacite = c;
@@ -28,7 +28,7 @@ struct conduct *conduct_create(const char *name, size_t a, size_t c){
     return cond;
   } else if ((name != NULL) && (name[0] == '\0')) { //si name est vide
     perror("conduct name is empty\n"); // considérer comme anonyme ?
-    exit(1);
+    exit(EXIT_FAILURE);
   } else { //si nommé
 
     int fd, error;
@@ -77,10 +77,10 @@ struct conduct *conduct_create(const char *name, size_t a, size_t c){
 struct conduct *conduct_open(const char *name){
   if(name == NULL){
     perror("anonymous conduct can't be opened.\n");
-    exit(1);
+    exit(EXIT_FAILURE);
   } else if ((name != NULL) && (name[0] == '\0')) { //si name est vide
     perror("conduct name is empty\n"); // considérer comme anonyme ?
-    exit(1);
+    exit(EXIT_FAILURE);
   } else { //si nommé
 
     struct stat st;
