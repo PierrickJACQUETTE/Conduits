@@ -1,16 +1,10 @@
-Premiere version :
-- struct conduct *conduct_create(const char *name, size_t a, size_t c);
-- struct conduct *conduct_open(const char *name);
-- void conduct_close(struct conduct *conduct);
-- void conduct_destroy(struct conduct *conduct);
-- ssize_t conduct_read(struct conduct *c, void *buf, size_t count);
-- ssize_t conduct_write(struct conduct *c, const void *buf, size_t count);
-- int conduct_write_eof(struct conduct *c);
-
 Pas fait :
 
 - gerer le cas du fork dans toutes les fonctions
-- gestion erreur avec goto pour liberer la memoire et return null 
-- test de performance
+- gestion erreur avec goto pour liberer la memoire et return null
+- tester les tubes nommes
+- test de performance : graphique ? figure possible, temps, nombre de threads
 - rapport
 - exemple d'utilisation
+- test sur d'autres sytemes
+- extension

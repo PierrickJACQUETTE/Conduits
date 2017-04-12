@@ -15,7 +15,7 @@
 
 #define ERROR(a,str) if (a < 0 && errno != 0) {perror(str); exit(0);}
 #define ERROR_MMAP(a) if (a == MAP_FAILED && errno != 0) {perror("mmap failed"); exit(0);}
-#define ERROR_MALLOC(a, str) if(a == NULL && errno != 0){perror(str); exit(0);}
+#define ERROR_MEMOIRE(a, str) if(a == NULL && errno != 0){perror(str); exit(0);}
 #define ERROR_THREAD(a,str) if(a !=0){perror(str); exit(0);}
 #define TMP "/tmp/"
 

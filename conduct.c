@@ -2,26 +2,29 @@
 
 struct conduct *conduct_create(const char *name, size_t a, size_t c){
   void* src;
+  int error;
   struct conduct* cond = (struct conduct*) malloc(sizeof(struct conduct));
-  ERROR_MALLOC(cond, "conduct.c : conduct_create : malloc conduct");
+  ERROR_MEMOIRE(cond, "conduct.c : conduct_create : malloc conduct");
   //si anonyme
   if(name == NULL){
     //ou alors PROT_NONE pour la rendre inaccessible
-    src = mmap(NULL, 1024, PROT_READ|PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    src = mmap(NULL, c, PROT_READ|PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     ERROR_MMAP(src);
     cond->name = name;
     cond->capacite = c;
     cond->a = a;
     cond->fd = -1;
     cond->retourMmap = src;
-    cond->sizeFstat = 1024;
+    cond->sizeFstat = c;
     cond->teteDeLecture = 0;
     cond->contenu = 0;
     cond->eof = false;
-    pthread_mutex_init(&cond->verrou, NULL);
-    pthread_cond_init(&cond->aEcrit, NULL);
-    pthread_cond_init(&cond->aLu, NULL);
-
+    error = pthread_mutex_init(&cond->verrou, NULL);
+    ERROR_THREAD(error, "conduct.c : conduct_create : pthread_mutex_init");
+    error = pthread_cond_init(&cond->aEcrit, NULL);
+    ERROR_THREAD(error, "conduct.c : conduct_create : pthread_cond_init : aEcrit");
+    error = pthread_cond_init(&cond->aLu, NULL);
+    ERROR_THREAD(error, "conduct.c : conduct_create : pthread_cond_init : aLu");
     return cond;
   } else if ((name != NULL) && (name[0] == '\0')) { //si name est vide
     perror("conduct name is empty\n"); // considérer comme anonyme ?
@@ -33,7 +36,7 @@ struct conduct *conduct_create(const char *name, size_t a, size_t c){
     char* s;
 
     s = malloc(sizeof(TMP)+(unsigned)strlen(name)*sizeof(char));
-    ERROR_MALLOC(s, "conduct.c : conduct_create : malloc name file");
+    ERROR_MEMOIRE(s, "conduct.c : conduct_create : malloc name file");
     error = sprintf(s, "%s%s", TMP, name);
     ERROR(error, "conduct.c : conduct_create : sprintf");
     fd = open(s, O_CREAT|O_WRONLY|O_EXCL, 0666);
@@ -47,7 +50,7 @@ struct conduct *conduct_create(const char *name, size_t a, size_t c){
       src = mmap(NULL, st.st_size,PROT_READ| PROT_WRITE, MAP_SHARED, fd, 0L);
       ERROR_MMAP(src);
 
-      ERROR_MALLOC(s, "conduct.c : conduct_create : malloc conduct");
+      ERROR_MEMOIRE(s, "conduct.c : conduct_create : malloc conduct");
       cond->name = name;
       cond->capacite = c;
       cond->a = a;
@@ -58,10 +61,12 @@ struct conduct *conduct_create(const char *name, size_t a, size_t c){
       cond->contenu = 0;
       cond->teteDeLecture = 0;
       cond->eof = false;
-      pthread_mutex_init(&cond->verrou, NULL);
-      pthread_cond_init(&cond->aEcrit, NULL);
-      pthread_cond_init(&cond->aLu, NULL);
-
+      error = pthread_mutex_init(&cond->verrou, NULL);
+      ERROR_THREAD(error, "conduct.c : conduct_create : pthread_mutex_init");
+      error = pthread_cond_init(&cond->aEcrit, NULL);
+      ERROR_THREAD(error, "conduct.c : conduct_create : pthread_cond_init : aEcrit");
+      error = pthread_cond_init(&cond->aLu, NULL);
+      ERROR_THREAD(error, "conduct.c : conduct_create : pthread_cond_init : aLu");
       error = write(fd, &cond, sizeof(&cond));
       ERROR(error, "conduct.c : conduct_create : write");
     }
@@ -83,7 +88,7 @@ struct conduct *conduct_open(const char *name){
     int error, fd;
 
     s = malloc(sizeof(TMP)+(unsigned)strlen(name)*sizeof(char));
-    ERROR_MALLOC(s, "conduct.c : conduct_open : malloc name file");
+    ERROR_MEMOIRE(s, "conduct.c : conduct_open : malloc name file");
     error = sprintf(s, "%s%s", TMP, name);
     ERROR(error, "conduct.c : conduct_open : sprintf");
 
@@ -108,6 +113,7 @@ void conduct_close(struct conduct *cond){
     error = close(cond->fd);
     ERROR(error, "conduct.c : conduct_close : close");
   }
+  //destroy sur les var de conditions ?
   free(cond);
 }
 
@@ -119,7 +125,7 @@ void conduct_destroy(struct conduct*cond){
     int error;
     name = (char*)cond->name;
     s = malloc(sizeof(TMP)+(unsigned)strlen(name)*sizeof(char));
-    ERROR_MALLOC(s, "conduct.c : conduct_destroy: malloc name file");
+    ERROR_MEMOIRE(s, "conduct.c : conduct_destroy: malloc name file");
     error = sprintf(s, "%s%s", TMP, name);
     ERROR(error, "conduct.c : conduct_destroy : sprintf");
     conduct_close(cond);
@@ -130,17 +136,16 @@ void conduct_destroy(struct conduct*cond){
 
 ssize_t myRead(struct conduct *c, void *buf, size_t count){
   int error;
+  void* errorMem;
   size_t fin, debut;
   count = (count < c->contenu)? count : c->contenu;
   fin = c->capacite - c->teteDeLecture;
   fin = (count < fin )? count : fin;
   debut = count - fin;
-  //memmove si zone de memoire se chevauchent par exemple evite une erreur
-  memcpy(buf, c->retourMmap+(c->teteDeLecture%c->capacite), fin);
-  //erreur a tester
-  //memmove si zone de memoire se chevauchent par exemple evite une erreur
-  memcpy(c->retourMmap, buf+fin, debut);
-  //erreur a tester
+  errorMem = memcpy(buf, c->retourMmap+(c->teteDeLecture%c->capacite), fin);
+  ERROR_MEMOIRE(errorMem, "conduct.c : myRead : memcpy : fin");
+  errorMem = memcpy(c->retourMmap, buf+fin, debut);
+  ERROR_MEMOIRE(errorMem, "conduct.c : myRead : memcpy : debut");
   c->teteDeLecture = (c->teteDeLecture+count)%c->capacite;
   c->contenu -= count;
   error = pthread_cond_signal(&c->aLu);
@@ -150,17 +155,16 @@ ssize_t myRead(struct conduct *c, void *buf, size_t count){
 
 ssize_t myWrite(struct conduct *c, const void *buf, size_t count){
   int error;
+  void* errorMem;
   size_t fin, debut;
   count = (count+c->contenu > c->capacite)? c->capacite - c->contenu : count;
   fin = c->capacite - (c->teteDeLecture + c->contenu)%c->capacite;
   fin = (count < fin )? count : fin;
   debut = count - fin;
-  //memmove si zone de memoire se chevauchent par exemple evite une erreur
-  memcpy(c->retourMmap+ c->teteDeLecture + c->contenu, buf, fin);
-  //erreur a tester
-  //memmove si zone de memoire se chevauchent par exemple evite une erreur
-  memcpy(c->retourMmap, buf+fin, debut);
-  //erreur a tester
+  errorMem = memcpy(c->retourMmap+ (c->teteDeLecture + c->contenu)%c->capacite, buf, fin);
+  ERROR_MEMOIRE(errorMem, "conduct.c : myRead : memcpy : fin");
+  errorMem = memcpy(c->retourMmap, buf+fin, debut);
+  ERROR_MEMOIRE(errorMem, "conduct.c : myRead : memcpy : fin");
   c->contenu += count;
   error = pthread_cond_signal(&c->aEcrit);
   ERROR_THREAD(error, "conduct.c : myWrite : pthread_cond_signal");
@@ -173,7 +177,7 @@ ssize_t conduct_read(struct conduct *c, void *buf, size_t count){
   error = pthread_mutex_lock(&c->verrou);
   ERROR_THREAD(error, "conduct.c : conduct_read : pthread_mutex_lock");
   if(c->contenu == 0 && c->eof == false){
-    while(c->contenu == 0 || c-> eof == false){
+    while(c->contenu == 0 && c->eof == false){
       error = pthread_cond_wait(&c->aEcrit, &c->verrou);
       ERROR(error, "conduct.c : conduct_read : pthread_cond_wait");
     }
@@ -194,7 +198,6 @@ ssize_t conduct_read(struct conduct *c, void *buf, size_t count){
   ERROR_THREAD(error, "conduct.c : conduct_read : pthread_mutex_unlock");
   return lu;
 }
-
 
 ssize_t conduct_write(struct conduct *c, const void *buf, size_t count){
   int error;
@@ -234,8 +237,10 @@ int conduct_write_eof(struct conduct *c){
   ERROR_THREAD(error, "conduct.c : conduct_write_eof : pthread_mutex_lock");
   if(c->eof == false){
     c->eof = true;
+    error = pthread_cond_signal(&c->aEcrit);
+    ERROR_THREAD(error, "conduct.c : conduct_write_eof : pthread_cond_signal");
   }
-  pthread_mutex_unlock(&c->verrou);
+  error = pthread_mutex_unlock(&c->verrou);
   ERROR_THREAD(error, "conduct.c : conduct_write_eof : pthread_mutex_unlock");
   return 0;
 }

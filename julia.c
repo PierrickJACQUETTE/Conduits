@@ -7,6 +7,13 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <gtk/gtk.h>
+
+
+#include <sys/time.h>
+#include <time.h>
+#include <getopt.h>
+
+
 #include "conduct.h"
 
 #define ITERATIONS 1000
