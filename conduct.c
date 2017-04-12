@@ -107,13 +107,16 @@ struct conduct *conduct_open(const char *name){
 
 void conduct_close(struct conduct *cond){
   int error;
-  error = munmap(cond->retourMmap, cond->sizeFstat);
-  ERROR(error, "conduct.c : conduct_close : munmap");
   if(cond->fd !=-1){
     error = close(cond->fd);
     ERROR(error, "conduct.c : conduct_close : close");
   }
-  //destroy sur les var de conditions ?
+  error = pthread_cond_destroy(&cond->aLu);
+  ERROR_THREAD(error, "conduct.c : conduct_close : pthread_cond_destroy : aLu");
+  error = pthread_cond_destroy(&cond->aEcrit);
+  ERROR_THREAD(error, "conduct.c : conduct_close : pthread_cond_destroy : aEcrit");
+  error = pthread_mutex_destroy(&cond->verrou);
+  ERROR_THREAD(error, "conduct.c : conduct_close : pthread_mutex_destroy");
   free(cond);
 }
 
@@ -129,6 +132,8 @@ void conduct_destroy(struct conduct*cond){
     error = sprintf(s, "%s%s", TMP, name);
     ERROR(error, "conduct.c : conduct_destroy : sprintf");
     conduct_close(cond);
+    error = munmap(cond->retourMmap, cond->sizeFstat);
+    ERROR(error, "conduct.c : conduct_destroy : munmap");
     error = unlink(s);
     ERROR(error, "conduct.c : conduct_destroy : unlink");
   }
