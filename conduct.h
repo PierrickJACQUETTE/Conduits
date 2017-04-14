@@ -14,7 +14,7 @@
 #include <stdbool.h>
 
 #define ERROR(a,str) if (a < 0 && errno != 0) {perror(str); exit(EXIT_FAILURE);}
-#define ERROR_MMAP(a) if (a == MAP_FAILED && errno != 0) {perror("mmap failed"); exit(EXIT_FAILURE);}
+#define ERROR_MMAP(a) if (a == MAP_FAILED && errno != 0) { test(); perror("mmap failed"); exit(EXIT_FAILURE);}
 #define ERROR_MEMOIRE(a, str) if(a == NULL && errno != 0){perror(str); exit(EXIT_FAILURE);}
 #define ERROR_THREAD(a,str) if(a !=0){perror(str); exit(EXIT_FAILURE);}
 #define TMP "/tmp/"

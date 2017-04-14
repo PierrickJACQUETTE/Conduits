@@ -14,7 +14,10 @@ test_fork: conduct.o test_fork.o
 	$(CC) -o test_fork conduct.o test_fork.o -pthread
 
 test_thread: conduct.o test_thread.o
-		$(CC) -o test_thread conduct.o test_thread.o -pthread
+	$(CC) -o test_thread conduct.o test_thread.o -pthread
+
+bob: conduct.o bob.o
+	$(CC) -o bob conduct.o bob.o -pthread
 
 conduct.o: conduct.c
 	$(CC) -o conduct.o -c conduct.c -Wall
@@ -23,10 +26,13 @@ main.o: main.c conduct.h
 	$(CC) -o main.o -c main.c -Wall
 
 test_fork.o: test_fork.c conduct.h
-		$(CC) -o test_fork.o -c test_fork.c -Wall
+	$(CC) -o test_fork.o -c test_fork.c -Wall
 
 test_thread.o: test_thread.c conduct.h
-				$(CC) -o test_thread.o -c test_thread.c -Wall
+	$(CC) -o test_thread.o -c test_thread.c -Wall
+
+bob.o: bob.c conduct.h
+	$(CC) -o bob.o -c bob.c -Wall
 
 clean:
 	rm -rf *.o *.h.gch
