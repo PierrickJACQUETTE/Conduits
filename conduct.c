@@ -70,53 +70,42 @@ ssize_t myWrite(struct conduct *c, const void *buf, size_t count){
 }
 
 struct conduct *conduct_create(const char *name, size_t a, size_t c){
-    void* src;
-    struct conduct* cond = mmap(NULL, sizeof(struct conduct), PROT_READ|PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-    ERROR_MEMOIRE(cond, "conduct.c : conduct_create : mmap conduct");
-    int error = pthread_mutex_init(&cond->verrou, NULL);
+    int error;
+    struct conduct* cond;
+    if(name == NULL || ((name != NULL) && (name[0] == '\0'))){//si anonyme
+        cond = mmap(NULL, sizeof(struct conduct), PROT_READ|PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+        ERROR_MEMOIRE(cond, "conduct.c : conduct_create : mmap conduct");
+    }else { //si nommé
+        char* s = concatenation(name, "conduct.c : conduct_create : concatenation");
+        int fd = open(s, O_CREAT|O_RDWR|O_EXCL, 0666);
+        free(s);
+        if(errno==EEXIST){
+            return conduct_open(name);
+        }else{
+            ERROR(fd, "conduct.c : conduct_create : open");
+            error = ftruncate(fd, sizeof(struct conduct));
+            ERROR(error, "conduct.c : conduct_create : ftruncate");
+            cond =  mmap(NULL, sizeof(struct conduct), PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0L);
+            ERROR_MEMOIRE(cond, "conduct.c : conduct_create : mmap conduct");
+            error = close(fd);
+            ERROR(error, "conduct.c : conduct_create : close");
+        }
+    }
+    error = pthread_mutex_init(&cond->verrou, NULL);
     ERROR_THREAD(error, "conduct.c : conduct_create : pthread_mutex_init");
     error = pthread_cond_init(&cond->aEcrit, NULL);
     ERROR_THREAD(error, "conduct.c : conduct_create : pthread_cond_init : aEcrit");
     error = pthread_cond_init(&cond->aLu, NULL);
     ERROR_THREAD(error, "conduct.c : conduct_create : pthread_cond_init : aLu");
+    void* src = mmap(NULL, c, PROT_READ| PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
+    ERROR_MEMOIRE(src, "conduct.c : conduct_create : mmap buffer");
+    cond->retourMmap = src;
     cond->contenu = 0;
     cond->teteDeLecture = 0;
     cond->eof = false;
     cond->name = name;
     cond->capacite = c;
     cond->a = a;
-    if(name == NULL || ((name != NULL) && (name[0] == '\0'))){//si anonyme
-        src = mmap(NULL, c, PROT_READ|PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-        ERROR_MMAP(src);
-        cond->retourMmap = src;
-        cond->fd = -1;
-        cond->sizeFstat = c;
-    }else { //si nommé
-        char* s = concatenation(cond->name, "conduct.c : conduct_create : concatenation");
-        int fd = open(s, O_CREAT|O_RDWR|O_EXCL, 0666);
-        if(errno==EEXIST){
-            error = munmap(cond, sizeof(struct conduc*));
-            ERROR(error, "conduct.c : conduct_create : munmap");
-            return conduct_open(name);
-        }else{
-            ERROR(fd, "conduct.c : conduct_create : open");
-            ftruncate(fd, 1);
-
-            struct stat st;
-            error = fstat(fd, &st);
-            ERROR(error, "conduct.c : conduct_create : fstat");
-            //printf("Last access: %lu.\n", (long unsigned) st.st_size);
-            src = mmap(NULL, st.st_size,PROT_READ| PROT_WRITE, MAP_SHARED, fd, 0L);
-            ERROR_MMAP(src);
-            cond->retourMmap = src;
-            cond->fd = fd;
-            cond->sizeFstat = st.st_size;
-            error = write(fd, &cond, sizeof(&cond)); // ecrire l'adresse ou est la structure
-            ERROR(error, "conduct.c : conduct_create : write");
-        }
-        error = close(fd);
-        ERROR(error, "conduct.c : conduct_create : close");
-    }
     return cond;
 }
 
@@ -126,15 +115,13 @@ struct conduct *conduct_open(const char *name){
         exit(EXIT_FAILURE);
     }else { //si nommé
         struct stat st;
-        char *s = malloc(sizeof(TMP)+(unsigned)strlen(name)*sizeof(char));
-        concatenation(name, "conduct.c : conduct_open : malloc name file");
-        int fd = open(s, O_RDONLY, 0666);
+        char *s = concatenation(name, "conduct.c : conduct_open : malloc name file");
+        int fd = open(s, O_RDWR, 0666);
+        free(s);
         ERROR(fd, "conduct.c : conduct_open : open");
         int error = fstat(fd, &st);
         ERROR(error, "conduct.c : conduct_open : fstat");
-        struct conduct* cond =NULL;
-        error = read(fd, cond, st.st_size -1);
-        ERROR(error, "conduct.c : conduct_open : read");
+        struct conduct* cond = mmap(NULL, sizeof(struct conduct), PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
         error = close(fd);
         ERROR(error, "conduct.c : conduct_open : close");
         return cond;
@@ -160,7 +147,7 @@ void conduct_destroy(struct conduct* cond){
     ERROR_THREAD(error, "conduct.c : conduct_close : pthread_cond_destroy : aEcrit");
     error = pthread_mutex_destroy(&cond->verrou);
     ERROR_THREAD(error, "conduct.c : conduct_close : pthread_mutex_destroy");
-    error = munmap(cond->retourMmap, cond->sizeFstat);
+    error = munmap(cond->retourMmap, sizeof(struct conduct));
     ERROR(error, "conduct.c : conduct_close : munmap");
     conduct_close(cond);
 }

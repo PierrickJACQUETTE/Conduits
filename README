@@ -1,8 +1,6 @@
 Pas fait :
 
-- gerer le cas du fork dans toutes les fonctions
 - gestion erreur avec goto pour liberer la memoire et return null
-- tester les tubes nommes
 - test de performance : graphique ? figure possible, temps, nombre de threads
 - rapport
 - exemple d'utilisation

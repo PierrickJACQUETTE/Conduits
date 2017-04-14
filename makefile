@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall
-EXEC = conduct conduct_julia test_fork test_thread
+EXEC = conduct conduct_julia test_fork test_thread test_nomme
 
 all: $(EXEC)
 
@@ -16,8 +16,8 @@ test_fork: conduct.o test_fork.o
 test_thread: conduct.o test_thread.o
 	$(CC) -o test_thread conduct.o test_thread.o -pthread
 
-bob: conduct.o bob.o
-	$(CC) -o bob conduct.o bob.o -pthread
+test_nomme: conduct.o test_nomme.o
+	$(CC) -o test_nomme conduct.o test_nomme.o -pthread
 
 conduct.o: conduct.c
 	$(CC) -o conduct.o -c conduct.c -Wall
@@ -31,8 +31,8 @@ test_fork.o: test_fork.c conduct.h
 test_thread.o: test_thread.c conduct.h
 	$(CC) -o test_thread.o -c test_thread.c -Wall
 
-bob.o: bob.c conduct.h
-	$(CC) -o bob.o -c bob.c -Wall
+test_nomme.o: test_nomme.c conduct.h
+	$(CC) -o test_nomme.o -c test_nomme.c -Wall
 
 clean:
 	rm -rf *.o *.h.gch
