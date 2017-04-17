@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall
-EXEC = conduct conduct_julia test_fork test_thread test_nomme
+EXEC = conduct conduct_julia test_fork test_thread test_nomme test_fork_nomme
 
 all: $(EXEC)
 
@@ -9,6 +9,9 @@ conduct: conduct.o main.o
 
 conduct_julia: conduct.o
 	$(CC) -o conduct_julia -g -O3 -ffast-math -Wall -pthread `pkg-config --cflags gtk+-3.0` julia.c conduct.c `pkg-config --libs gtk+-3.0` -lm
+
+test_fork_nomme: test_fork_nomme.o conduct.o
+	$(CC) -o test_fork_nomme test_fork_nomme.o conduct.o -pthread
 
 test_fork: conduct.o test_fork.o
 	$(CC) -o test_fork conduct.o test_fork.o -pthread
@@ -24,6 +27,9 @@ conduct.o: conduct.c
 
 main.o: main.c conduct.h
 	$(CC) -o main.o -c main.c -Wall
+
+test_fork_nomme.o: test_fork_nomme.c conduct.h
+	$(CC) -o test_fork_nomme.o -c test_fork_nomme.c -Wall
 
 test_fork.o: test_fork.c conduct.h
 	$(CC) -o test_fork.o -c test_fork.c -Wall
