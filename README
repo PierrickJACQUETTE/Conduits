@@ -1,8 +1,14 @@
-Pas fait :
+TODO
 
 - gestion erreur avec goto pour liberer la memoire et return null
 - test de performance : graphique ? figure possible, temps, nombre de threads
 - rapport
 - exemple d'utilisation
-- test sur d'autres sytemes
+- test sur d'autres systemes (vm romain + rasp alex)
 - extension
+- faire le projet en utilisant les tubes et les sockets pour la comparaison.
+- version : un écrivain et un lecteur simultanément)
+- pour les graphs utiliser un timer pour val
+- test nommé en pthread
+- faire correctement un système client / serveur
+(- envoie mail pour possibles exemples)
