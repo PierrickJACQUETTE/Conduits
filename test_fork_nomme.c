@@ -15,13 +15,9 @@ int main(int argc, char const *argv[]) {
         if(serveur == NULL){
             perror("serveur null");
         }
-
-
         char* buff = malloc(sizeof(char)*4);
         buff = "test";
         conduct_write(serveur, buff, sizeof(buff));
-        printf("done writing\n");
-
         conduct_close(serveur);
         exit(0);
     } else {

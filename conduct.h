@@ -20,7 +20,6 @@
 
 struct conduct {
     const void* name;
-    void* retourMmap; //pour destroy
     size_t capacite; //capacité
     size_t a; //atomicité si a<=c
     size_t contenu;
@@ -29,6 +28,7 @@ struct conduct {
     pthread_mutex_t verrou;
     pthread_cond_t aEcrit;
     pthread_cond_t aLu;
+    void* retourMmap;
 };
 
 struct conduct *conduct_create(const char *name, size_t a, size_t c);

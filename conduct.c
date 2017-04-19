@@ -1,31 +1,5 @@
 #include "conduct.h"
 
-void test(){
-    if(errno == EACCES) {
-        printf("EACCES\n");
-    } else if(errno == EAGAIN){
-        printf("EAGAIN\n");
-    } else if(errno == EBADF){
-        printf("EBADF\n");
-    } else if(errno == EINVAL) {
-        printf("EINVAL\n");
-    } else if(errno == ENFILE) {
-        printf("ENFILE\n");
-    } else if(errno == ENODEV){
-        printf("ENODEV\n");
-    } else if(errno == ENOMEM) {
-        printf("ENOMEM\n");
-    } else if(errno == EPERM){
-        printf("EPERM\n");
-    } else if(errno == ETXTBSY){
-        printf("ETXTBSY\n");
-    } else if(errno == EOVERFLOW){
-        printf("EOVERFLOW\n");
-    } else {
-        printf("shit\n");
-    }
-}
-
 char* concatenation(const char* name, char* where){
     char* s = malloc(sizeof(TMP)+(unsigned)strlen(name)*sizeof(char));
     ERROR_MEMOIRE(s, where);
@@ -45,7 +19,7 @@ ssize_t myRead(struct conduct *c, void *buf, size_t count){
     ERROR_MEMOIRE(errorMem, "conduct.c : myRead : memcpy : debut");
     c->teteDeLecture = (c->teteDeLecture+count)%c->capacite;
     c->contenu -= count;
-    int error = msync(c->retourMmap, c->capacite, MS_SYNC);
+    int error = msync(c, sizeof(struct conduct)+c->capacite*sizeof(char), MS_SYNC);
     ERROR(error, "conduct.c : myRead : msync");
     error = pthread_cond_signal(&c->aLu);
     ERROR_THREAD(error, "conduct.c : myRead : pthread_cond_signal");
@@ -62,7 +36,7 @@ ssize_t myWrite(struct conduct *c, const void *buf, size_t count){
     errorMem = memcpy(c->retourMmap, buf+fin, debut);
     ERROR_MEMOIRE(errorMem, "conduct.c : myRead : memcpy : fin");
     c->contenu += count;
-    int error = msync(c->retourMmap, c->capacite, MS_SYNC);
+    int error = msync(c, sizeof(struct conduct)+c->capacite*sizeof(char), MS_SYNC);
     ERROR(error, "conduct.c : myWrite : msync");
     error = pthread_cond_signal(&c->aEcrit);
     ERROR_THREAD(error, "conduct.c : myWrite : pthread_cond_signal");
@@ -72,8 +46,9 @@ ssize_t myWrite(struct conduct *c, const void *buf, size_t count){
 struct conduct *conduct_create(const char *name, size_t a, size_t c){
     int error;
     struct conduct* cond;
+    size_t length = sizeof(struct conduct)+c*sizeof(void);
     if(name == NULL || ((name != NULL) && (name[0] == '\0'))){//si anonyme
-        cond = mmap(NULL, sizeof(struct conduct), PROT_READ|PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+        cond = mmap(NULL, length, PROT_READ|PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
         ERROR_MEMOIRE(cond, "conduct.c : conduct_create : mmap conduct");
     }else { //si nommé
         char* s = concatenation(name, "conduct.c : conduct_create : concatenation");
@@ -83,9 +58,9 @@ struct conduct *conduct_create(const char *name, size_t a, size_t c){
             return conduct_open(name);
         }else{
             ERROR(fd, "conduct.c : conduct_create : open");
-            error = ftruncate(fd, sizeof(struct conduct));
+            error = ftruncate(fd, length);
             ERROR(error, "conduct.c : conduct_create : ftruncate");
-            cond =  mmap(NULL, sizeof(struct conduct), PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0L);
+            cond =  mmap(NULL,  length, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0L);
             ERROR_MEMOIRE(cond, "conduct.c : conduct_create : mmap conduct");
             error = close(fd);
             ERROR(error, "conduct.c : conduct_create : close");
@@ -97,9 +72,7 @@ struct conduct *conduct_create(const char *name, size_t a, size_t c){
     ERROR_THREAD(error, "conduct.c : conduct_create : pthread_cond_init : aEcrit");
     error = pthread_cond_init(&cond->aLu, NULL);
     ERROR_THREAD(error, "conduct.c : conduct_create : pthread_cond_init : aLu");
-    void* src = mmap(NULL, c, PROT_READ| PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
-    ERROR_MEMOIRE(src, "conduct.c : conduct_create : mmap buffer");
-    cond->retourMmap = src;
+    cond->retourMmap = (void*)(cond)+sizeof(struct conduct);
     cond->contenu = 0;
     cond->teteDeLecture = 0;
     cond->eof = false;
@@ -147,8 +120,6 @@ void conduct_destroy(struct conduct* cond){
     ERROR_THREAD(error, "conduct.c : conduct_close : pthread_cond_destroy : aEcrit");
     error = pthread_mutex_destroy(&cond->verrou);
     ERROR_THREAD(error, "conduct.c : conduct_close : pthread_mutex_destroy");
-    error = munmap(cond->retourMmap, sizeof(struct conduct));
-    ERROR(error, "conduct.c : conduct_close : munmap");
     conduct_close(cond);
 }
 
