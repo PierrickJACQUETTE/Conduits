@@ -17,7 +17,7 @@ int main(int argc, char const *argv[]) {
     write(1, "\n", 1);
     conduct_read(client, reponse, sizeof(reponse));
     write(1,reponse,strlen(reponse) );
-    write(1, "\n", 4);
+    write(1, "\n", 1);
     conduct_close(client);
     conduct_destroy(serveur);
     return 0;
