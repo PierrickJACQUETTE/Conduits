@@ -26,8 +26,11 @@ struct conduct {
     size_t teteDeLecture;
     bool eof;
     pthread_mutex_t verrou;
+    pthread_mutexattr_t attrVerrou;
     pthread_cond_t aEcrit;
+    pthread_condattr_t attrEcrit;
     pthread_cond_t aLu;
+    pthread_condattr_t attrLu;
     void* retourMmap;
 };
 
