@@ -1,5 +1,4 @@
 #include "conduct.h"
-#include <sys/wait.h>
 
 int main(int argc, char const *argv[]) {
     struct conduct* serveur = conduct_create("serveur", 20, sizeof(char)*64);
@@ -22,9 +21,11 @@ int main(int argc, char const *argv[]) {
             if(erreur == -1){
                 perror("write");
             }
+            erreur = write(STDOUT_FILENO, "\n", 1);
+            if(erreur == -1){
+                perror("write");
+            }
         }
     }
-
-    sleep(30);
-
+    conduct_destroy(serveur);
 }

@@ -4,7 +4,7 @@ EXEC = conduct conduct_julia test_fork test_thread test_nomme test_fork_nomme te
 
 all: $(EXEC)
 
-client: client.o main.o
+client: client.o conduct.o
 	$(CC) -o client conduct.o client.o -pthread
 
 conduct: conduct.o main.o
@@ -13,7 +13,7 @@ conduct: conduct.o main.o
 conduct_julia: conduct.o
 	$(CC) -o conduct_julia -g -O3 -ffast-math -Wall -pthread `pkg-config --cflags gtk+-3.0` julia.c conduct.c `pkg-config --libs gtk+-3.0` -lm
 
-serveur: serveur.o main.o
+serveur: serveur.o conduct.o
 	$(CC) -o serveur conduct.o serveur.o -pthread
 
 test_fork_nomme: test_fork_nomme.o conduct.o
@@ -31,7 +31,7 @@ test_thread: conduct.o test_thread.o
 test_nomme: conduct.o test_nomme.o
 	$(CC) -o test_nomme conduct.o test_nomme.o -pthread
 
-client.o: client.c
+client.o: client.c conduct.h
 	$(CC) -o client.o -c client.c -Wall
 
 conduct.o: conduct.c
@@ -40,7 +40,7 @@ conduct.o: conduct.c
 main.o: main.c conduct.h
 	$(CC) -o main.o -c main.c -Wall
 
-serveur.o: serveur.c
+serveur.o: serveur.c conduct.h
 	$(CC) -o serveur.o -c serveur.c -Wall
 
 test_fork_nomme.o: test_fork_nomme.c conduct.h

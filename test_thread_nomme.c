@@ -1,6 +1,3 @@
-#include <sys/wait.h>
-#include <pthread.h>
-
 #include "conduct.h"
 
 void* first(void* ptr){
@@ -12,7 +9,6 @@ void* first(void* ptr){
 }
 
 void* second(void* ptr){
-    sleep(1);
     struct conduct* n = conduct_open("test");
     char* buff2 = malloc(sizeof(char)*4);
     buff2 = "azrt";

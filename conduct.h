@@ -31,7 +31,6 @@ struct conduct {
     pthread_condattr_t attrEcrit;
     pthread_cond_t aLu;
     pthread_condattr_t attrLu;
-    void* retourMmap;
 };
 
 struct conduct *conduct_create(const char *name, size_t a, size_t c);

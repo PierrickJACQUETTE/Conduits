@@ -15,13 +15,6 @@ int main(int argc, char const *argv[]) {
             perror("conduct_write");
         }
     }
-
-    // char* buff = malloc(sizeof(char)*4);
-    // buff = "test";
-    // conduct_write(client, buff, sizeof(buff));
-    // printf("done writing\n");
-
-
     conduct_close(client);
     exit(EXIT_SUCCESS);
 }
