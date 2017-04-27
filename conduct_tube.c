@@ -97,6 +97,6 @@ ssize_t conduct_write(struct conduct *c, const void *buf, size_t count){
 
 int conduct_write_eof(struct conduct *c){
     int error = close(c->tubeDescAnonyme[1]);
-    ERROR(error, "conduct.c : conduct_close : close 1 ");
+    ERROR(error, "conduct.c : conduct_write_eof : close 1 ");
     return 0;
 }
