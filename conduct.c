@@ -161,7 +161,7 @@ ssize_t conduct_read(struct conduct *c, void *buf, size_t count){
     if(c->contenu == 0 && c->eof == false){
         while(c->contenu == 0 && c->eof == false){
             error = pthread_cond_wait(&c->aEcrit, &c->verrou);
-            ERROR(error, "conduct.c : conduct_read : pthread_cond_wait");
+            ERROR_THREAD(error, "conduct.c : conduct_read : pthread_cond_wait");
         }
         if(c->eof == true){
             lu = 0;
@@ -192,7 +192,7 @@ ssize_t conduct_write(struct conduct *c, const void *buf, size_t count){
         if(count <= c->a){
             while(c->capacite - c->contenu < count){
                 error = pthread_cond_wait(&c->aLu, &c->verrou);
-                ERROR(error, "conduct.c : conduct_write : pthread_cond_wait");
+                ERROR_THREAD(error, "conduct.c : conduct_write : pthread_cond_wait");
             }
             ecrit = myWrite(c, buf, count);
         }else if(count > c->a){
