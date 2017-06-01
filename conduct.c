@@ -223,3 +223,20 @@ int conduct_write_eof(struct conduct *c){
     ERROR_THREAD(error, "conduct.c : conduct_write_eof : pthread_mutex_unlock");
     return 0;
 }
+
+ssize_t conduct_readv(struct conduct *c, const struct iovec *iov, int iovcnt){
+    int res = 0, i;
+    for(i = 0; i < iovcnt; i++){
+        res += conduct_read(c, iov[i].iov_base, iov[i].iov_len);
+    }
+    return res;
+}
+
+ssize_t conduct_writev(struct conduct *c, const struct iovec *iov, int iovcnt){
+
+    int res = 0, i;
+    for(i = 0; i < iovcnt; i++){
+        res += conduct_write(c, iov[i].iov_base, iov[i].iov_len);
+    }
+    return res;
+}

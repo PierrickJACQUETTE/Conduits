@@ -12,6 +12,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <stdbool.h>
+#include <sys/uio.h>
 
 #define ERROR(a,str) if (a < 0 && errno != 0) {perror(str); exit(EXIT_FAILURE);}
 #define ERROR_ARGUMENT_I(a,str) if(a<1){errno = EINVAL; perror(str); exit(EXIT_FAILURE);}
@@ -38,7 +39,9 @@ struct conduct {
 struct conduct *conduct_create(const char *name, size_t a, size_t c);
 struct conduct *conduct_open(const char *name);
 ssize_t conduct_read(struct conduct *c, void *buf, size_t count);
+ssize_t conduct_readv(struct conduct *c, const struct iovec *iov, int iovcnt);
 ssize_t conduct_write(struct conduct *c, const void *buf, size_t count);
+ssize_t conduct_writev(struct conduct *c, const struct iovec *iov, int iovcnt);
 int conduct_write_eof(struct conduct *c);
 void conduct_close(struct conduct *conduct);
 void conduct_destroy(struct conduct *conduct);
