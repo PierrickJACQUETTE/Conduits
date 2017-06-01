@@ -234,9 +234,19 @@ ssize_t conduct_readv(struct conduct *c, const struct iovec *iov, int iovcnt){
 
 ssize_t conduct_writev(struct conduct *c, const struct iovec *iov, int iovcnt){
 
-    int res = 0, i;
+    int res = 0, i, error;
     for(i = 0; i < iovcnt; i++){
-        res += conduct_write(c, iov[i].iov_base, iov[i].iov_len);
+        res += iov[i].iov_len;
     }
+
+    char* s = malloc(res*sizeof(char));
+    ERROR_MEMOIRE(s, "conduct.c : conduct_writev : malloc");
+
+    for(i = 0; i < iovcnt; i++){
+        error = sprintf(s, "%s%s", s, (char*)iov[i].iov_base);
+        ERROR(error, "conduct.c : conduct_writev : sprintf");
+    }
+
+    res = conduct_write(c, s, strlen(s));
     return res;
 }
