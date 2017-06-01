@@ -5,17 +5,20 @@ int main(int argc, char const *argv[]) {
     if(serveur==NULL){
         printf("NULL\n");
     }
-    char* buff = malloc(sizeof(char)*4);
-    buff = "test";
+    int size = 10;
+    char* buff = malloc(sizeof(char)*size);
+    memset(buff, 0, size+1);
+    buff = "azertyuioz";
     struct conduct* client = conduct_open("serveur");
-    conduct_write(serveur, buff, sizeof(buff));
-    buff = "azrt";
-    char* reponse = malloc(sizeof(char)*4);
-    conduct_write(client, buff, sizeof(buff));
-    conduct_read(client, reponse, sizeof(reponse));
+    conduct_write(serveur, buff, strlen(buff));
+    buff = "azrtpoiupa";
+    conduct_write(client, buff, strlen(buff));
+    char* reponse = malloc(sizeof(char)*size);
+    memset(reponse, 0, size+1);
+    conduct_read(client, reponse, size);
     write(1,reponse,strlen(reponse));
     write(1, "\n", 1);
-    conduct_read(client, reponse, sizeof(reponse));
+    conduct_read(client, reponse, size);
     write(1,reponse,strlen(reponse) );
     write(1, "\n", 1);
     conduct_close(client);

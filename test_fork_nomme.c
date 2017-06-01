@@ -4,6 +4,7 @@
 int main(int argc, char const *argv[]) {
 
     pid_t pid;
+    int size = 10;
 
     pid = fork();
     if(pid < 0){
@@ -15,16 +16,22 @@ int main(int argc, char const *argv[]) {
         if(serveur == NULL){
             perror("serveur null");
         }
-        char* buff = malloc(sizeof(char)*4);
-        buff = "test";
-        conduct_write(serveur, buff, sizeof(buff));
+        char* buff = malloc(sizeof(char)*size);
+        memset(buff, 0, size+1);
+        buff = "azertyuioz";
+        conduct_write(serveur, buff, strlen(buff));
+        buff = "azrtpoiupa";
+        conduct_write(serveur, buff, strlen(buff));
         conduct_close(serveur);
         exit(0);
     } else {
         struct conduct* client = conduct_open("serveur");
-        char* reponse = malloc(sizeof(char)*4);
-        wait(NULL);
-        conduct_read(client, reponse, sizeof(reponse));
+        char* reponse = malloc(sizeof(char)*size);
+        memset(reponse, 0, size+1);
+        conduct_read(client, reponse, size);
+        write(1,reponse,strlen(reponse));
+        write(1, "\n", 1);
+        conduct_read(client, reponse, size);
         write(1,reponse,strlen(reponse));
         write(1, "\n", 1);
         conduct_destroy(client);
