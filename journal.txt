@@ -19,7 +19,7 @@ extensions :
 	- gestion erreur pour liberer la memoire et return null (et errno) (cf extension dans le sujet)
 
 	-Multi acteurs :
-		deuxieme version conduct avec possibilité d'avoir multi lecteur
+		deuxieme version conduct avec possibilité d'avoir multi lecteur => Samuel
 		troisieme version conduct avec possibilité d'avoir lecteur/ecrivan a endroit different
 		quatrieme version conduct avec different ecrivain ....
 
