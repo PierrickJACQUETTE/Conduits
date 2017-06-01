@@ -150,7 +150,6 @@ void conduct_destroy(struct conduct* cond){
     ERROR_THREAD(error, "conduct.c : conduct_destroy : pthread_mutexattr_destroy");
     conduct_close(cond);
 }
-
 ssize_t conduct_read(struct conduct *c, void *buf, size_t count){
     ERROR_ARGUMENT_S(c, "c doit etre non null");
     ERROR_ARGUMENT_S(buf, "buf doit etre non null");
@@ -163,14 +162,8 @@ ssize_t conduct_read(struct conduct *c, void *buf, size_t count){
             error = pthread_cond_wait(&c->aEcrit, &c->verrou);
             ERROR_THREAD(error, "conduct.c : conduct_read : pthread_cond_wait");
         }
-        if(c->eof == true){
-            lu = 0;
-        }else{
-            lu = myRead(c, buf, count);
-        }
-    }else if(c->contenu == 0 && c->eof == true){
-        lu = 0;
-    }else if(c->contenu > 0){
+    }
+    if(c->eof == false || c->contenu >= 0){
         lu = myRead(c, buf, count);
     }
     error = pthread_mutex_unlock(&c->verrou);
@@ -185,25 +178,22 @@ ssize_t conduct_write(struct conduct *c, const void *buf, size_t count){
     ssize_t ecrit = 0;
     int error = pthread_mutex_lock(&c->verrou);
     ERROR_THREAD(error, "conduct.c : conduct_write : pthread_mutex_lock");
+    if(count <= c->a){
+        while(c->capacite - c->contenu < count && c->eof == false){
+            error = pthread_cond_wait(&c->aLu, &c->verrou);
+            ERROR_THREAD(error, "conduct.c : conduct_write : pthread_cond_wait");
+        }
+    }else if(count > c->a && c->capacite == c->contenu){
+        while(c->capacite - c->contenu <= 0 && c->eof == false){
+            error = pthread_cond_wait(&c->aLu, &c->verrou);
+            ERROR_THREAD(error, "conduct.c : conduct_write : pthread_cond_wait");
+        }
+    }
     if(c->eof == true){
         ecrit = -1;
         errno = EPIPE;
     }else{
-        if(count <= c->a){
-            while(c->capacite - c->contenu < count){
-                error = pthread_cond_wait(&c->aLu, &c->verrou);
-                ERROR_THREAD(error, "conduct.c : conduct_write : pthread_cond_wait");
-            }
-            ecrit = myWrite(c, buf, count);
-        }else if(count > c->a){
-            if(c->capacite == c->contenu){
-                while(c->capacite - c->contenu <= 0){
-                    error = pthread_cond_wait(&c->aLu, &c->verrou);
-                    ERROR_THREAD(error, "conduct.c : conduct_write : pthread_cond_wait");
-                }
-            }
-            ecrit = myWrite(c, buf, count);
-        }
+        ecrit = myWrite(c, buf, count);
     }
     error = pthread_mutex_unlock(&c->verrou);
     ERROR_THREAD(error, "conduct.c : conduct_write : pthread_mutex_unlock");
