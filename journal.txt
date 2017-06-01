@@ -1,6 +1,6 @@
-A Faire : 
+A Faire :
 
-pour le projet minimal : 
+pour le projet minimal :
 
 	- rapport
 		Page de presentation
@@ -12,25 +12,19 @@ pour le projet minimal :
 		Statistiques : graphique et courte conclusion sur les graphs
 		=> On fait un dossier drive ?
 
-	- test sur d'autres systemes dans le sujet ils parlent 
+	- test sur d'autres systemes dans le sujet ils disent : "Sur un Raspberry Pi ou un BeagleBone, par exemple."
 
 extensions :
 
-	- memset sur la structure à l'init => Pierrick 
-
-	- verifier la solidite des interactions avec l'utilisateur 
-		rajouter des tests sur les arguments des fonctions, quand on nous attends une structure, que l'on nous donne pas un NULL
-		....
-
 	- gestion erreur pour liberer la memoire et return null (et errno) (cf extension dans le sujet)
-	
-	-Multi acteurs : 
+
+	-Multi acteurs :
 		deuxieme version conduct avec possibilité d'avoir multi lecteur
 		troisieme version conduct avec possibilité d'avoir lecteur/ecrivan a endroit different
 		quatrieme version conduct avec different ecrivain ....
 
 	- test de performance : graphique
-		figure possible, temps, nombre de threads 
+		figure possible, temps, nombre de threads
 		à effectuer sur julia en faisant une moyenne sur plusieurs essais
 		comparaison entre tube, socket et conduct
 		comparaison entre conduct, conduct multi lecteur, conduct avancé
@@ -38,7 +32,7 @@ extensions :
 	- exemple d'utilisation de lecture et ecriture par lots => La j'ai besoin de vos idees
 	- lecture et ecriture par lots (cf extension dans le sujet) => Pierrick des que l'on a des idees
 
-Fait : 
+Fait :
 
 - 80% du  projet minimal
 - faire le projet en utilisant les tubes et les sockets

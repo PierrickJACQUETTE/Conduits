@@ -14,6 +14,8 @@
 #include <stdbool.h>
 
 #define ERROR(a,str) if (a < 0 && errno != 0) {perror(str); exit(EXIT_FAILURE);}
+#define ERROR_ARGUMENT_I(a,str) if(a<1){errno = EINVAL; perror(str); exit(EXIT_FAILURE);}
+#define ERROR_ARGUMENT_S(a,str) if(a == NULL){errno = EINVAL; perror(str); exit(EXIT_FAILURE);}
 #define ERROR_MEMOIRE(a, str) if(a == NULL && errno != 0){perror(str); exit(EXIT_FAILURE);}
 #define ERROR_THREAD(a,str) if(a !=0){perror(str); exit(EXIT_FAILURE);}
 #define TMP "/tmp/"

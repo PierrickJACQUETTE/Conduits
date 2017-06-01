@@ -44,8 +44,10 @@ ssize_t myWrite(struct conduct *c, const void *buf, size_t count){
 }
 
 struct conduct *conduct_create(const char *name, size_t a, size_t c){
+    ERROR_ARGUMENT_I(a, "a doit etre >0");
+    ERROR_ARGUMENT_I(c, "c doit etre >0");
     int error;
-    struct conduct* cond;
+    struct conduct* cond = NULL;
     size_t length = sizeof(struct conduct)+c*sizeof(void);
     if(name == NULL || ((name != NULL) && (name[0] == '\0'))){//si anonyme
         cond = mmap(NULL, length, PROT_READ|PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
@@ -66,6 +68,8 @@ struct conduct *conduct_create(const char *name, size_t a, size_t c){
             ERROR(error, "conduct.c : conduct_create : close");
         }
     }
+    cond = memset(cond, 0, length);
+    ERROR_MEMOIRE(cond, "conduct.c : conduct_create : memset");
     error = pthread_mutexattr_init(&cond->attrVerrou);
     ERROR_THREAD(error, "conduct.c : conduct_create : pthread_mutexattr_init");
     error = pthread_mutexattr_setpshared(&cond->attrVerrou, PTHREAD_PROCESS_SHARED);
@@ -118,11 +122,13 @@ struct conduct *conduct_open(const char *name){
 }
 
 void conduct_close(struct conduct *cond){
+    ERROR_ARGUMENT_S(cond, "cond doit etre non null");
     int error = munmap(cond, sizeof(struct cond*));
     ERROR(error, "conduct.c : conduct_close : munmap struct");
 }
 
 void conduct_destroy(struct conduct* cond){
+    ERROR_ARGUMENT_S(cond, "cond doit etre non null");
     int error;
     if(cond->name != NULL){
         char *s = concatenation(cond->name, "conduct.c : conduct_destroy: malloc name file");
@@ -146,6 +152,9 @@ void conduct_destroy(struct conduct* cond){
 }
 
 ssize_t conduct_read(struct conduct *c, void *buf, size_t count){
+    ERROR_ARGUMENT_S(c, "c doit etre non null");
+    ERROR_ARGUMENT_S(buf, "buf doit etre non null");
+    ERROR_ARGUMENT_I(count, "count doit etre >0");
     ssize_t lu = 0;
     int error = pthread_mutex_lock(&c->verrou);
     ERROR_THREAD(error, "conduct.c : conduct_read : pthread_mutex_lock");
@@ -170,6 +179,9 @@ ssize_t conduct_read(struct conduct *c, void *buf, size_t count){
 }
 
 ssize_t conduct_write(struct conduct *c, const void *buf, size_t count){
+    ERROR_ARGUMENT_S(c, "c doit etre non null");
+    ERROR_ARGUMENT_S(buf, "buf doit etre non null");
+    ERROR_ARGUMENT_I(count, "count doit etre >0");
     ssize_t ecrit = 0;
     int error = pthread_mutex_lock(&c->verrou);
     ERROR_THREAD(error, "conduct.c : conduct_write : pthread_mutex_lock");
@@ -199,6 +211,7 @@ ssize_t conduct_write(struct conduct *c, const void *buf, size_t count){
 }
 
 int conduct_write_eof(struct conduct *c){
+    ERROR_ARGUMENT_S(c, "c doit etre non null");
     int error = pthread_mutex_lock(&c->verrou);
     ERROR_THREAD(error, "conduct.c : conduct_write_eof : pthread_mutex_lock");
     if(c->eof == false){
