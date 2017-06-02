@@ -10,8 +10,8 @@ client: client.o conduct.o
 conduct: conduct.o
 	$(CC) -o conduct conduct.o -pthread
 
-conduct_julia: conduct2.o
-	$(CC) -o conduct_julia -g -O3 -ffast-math -Wall -pthread `pkg-config --cflags gtk+-3.0` julia.c conduct2.c `pkg-config --libs gtk+-3.0` -lm
+conduct_julia: conduct.o
+	$(CC) -o conduct_julia -g -O3 -ffast-math -Wall -pthread `pkg-config --cflags gtk+-3.0` julia.c conduct.c `pkg-config --libs gtk+-3.0` -lm
 
 serveur: serveur.o conduct.o
 	$(CC) -o serveur conduct.o serveur.o -pthread
