@@ -53,7 +53,7 @@ struct conduct *conduct_open(const char *name){
             fd = open(s, O_WRONLY);
         }
         ERROR(fd, "conduct_tube.c : conduct_open : open in write");
-        int fd2 = open(FIFO2, O_RDONLY|O_NONBLOCK);
+        int fd2 = open(FIFO2, O_RDONLY);
         ERROR(fd2, "conduct_tube.c : conduct_open : open in read");
         struct conduct* cond = mmap(NULL, sizeof(struct conduct), PROT_READ|PROT_WRITE, MAP_SHARED| MAP_ANONYMOUS, -1 , 0);
         ERROR_MEMOIRE(cond, "conduct_tube.c : conduct_open : mmap");
