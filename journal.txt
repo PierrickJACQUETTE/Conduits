@@ -2,25 +2,12 @@ A Faire :
 
 pour le projet minimal :
 
-	- rapport => Pierrick 1ere version
-		Page de presentation
-		Introduction
-		La structure choisie : mettre la structure et expliqué l'utilité de chaque champs
-		L'interface propose  : lister les fonctions avec un petit descriptif (petit man)
-		Compilation/Execution : comment cela fonctionne
-		Les exemples fournies : lister les differents exemples en expliquant ce qu'ils font
-		Statistiques : graphique et courte conclusion sur les graphs
-		=> On fait un dossier drive ?
-
 	- test sur d'autres systemes dans le sujet ils disent : "Sur un Raspberry Pi ou un BeagleBone, par exemple."
 
 extensions :
 
 	- gestion erreur pour liberer la memoire et return null (et errno) (cf extension dans le sujet)
 
-	-Multi acteurs :
-		conduct avec possibilité d'avoir lecteur/ecrivan a endroit different
-		
 	- test de performance : graphique
 		figure possible, temps, nombre de threads
 		à effectuer sur julia en faisant une moyenne sur plusieurs essais
@@ -30,9 +17,12 @@ extensions :
 	- exemple d'utilisation de lecture et ecriture par lots
 	- lecture et ecriture par lots (cf extension dans le sujet) => Samuel
 
+	(-Multi acteurs :
+		conduct avec possibilité d'avoir lecteur/ecrivan a endroit different)
+
 Fait :
 
-- 80% du  projet minimal
+- 90% du  projet minimal
 - faire le projet en utilisant les tubes et les sockets
 - exemple d'utilisation
 - makefile
