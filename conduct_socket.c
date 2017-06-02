@@ -25,8 +25,8 @@ struct conduct *conduct_create(const char *name, size_t a, size_t c){
         struct sockaddr_un sun;
         sun.sun_family = AF_UNIX;
         char* s = concatenation(name, "conduct_socket.c : conduct_create : concatenation");
-        error = strcpy(sun.sun_path, s);
-        ERROR_MEMOIRE(error, "conduct_socket.c : conduct_create : strcpy");
+        char* error2 = strcpy(sun.sun_path, s);
+        ERROR_MEMOIRE(error2, "conduct_socket.c : conduct_create : strcpy");
         free(s);
         int len = sizeof(sun.sun_family) + strlen(sun.sun_path);
         error = bind(cond->socket[0], (struct sockaddr *)&sun, len);
@@ -56,15 +56,15 @@ struct conduct *conduct_open(const char *name){
         cond->name = name;
         struct sockaddr_un sun;
         sun.sun_family = AF_UNIX;
-        error = strcpy(sun.sun_path, s);
-        ERROR_MEMOIRE(error, "conduct_socket.c : conduct_open : strcpy");
+        char* error2 = strcpy(sun.sun_path, s);
+        ERROR_MEMOIRE(error2, "conduct_socket.c : conduct_open : strcpy");
         int len = sizeof(sun.sun_family) + strlen(sun.sun_path);
         error = connect(cond->socket[1], (struct sockaddr *)&sun, len);
         if(errno==ENOENT){
             sleep(1);
             error = connect(cond->socket[1], (struct sockaddr *)&sun, len);
         }
-        ERROR_MEMOIRE(error, "conduct_socket.c : conduct_open : connect");
+        ERROR(error, "conduct_socket.c : conduct_open : connect");
         cond->serveur = false;
         free(s);
         return cond;
@@ -103,7 +103,7 @@ ssize_t conduct_read(struct conduct *c, void *buf, size_t count){
         else{
             lu = recv(c->socket[1], buf, count,0);
         }
-		ERROR(error, "conduct_socket.c : conduct_read : recv ");
+		ERROR(lu, "conduct_socket.c : conduct_read : recv ");
     }
     return lu;
 }
@@ -111,7 +111,7 @@ ssize_t conduct_read(struct conduct *c, void *buf, size_t count){
 ssize_t conduct_write(struct conduct *c, const void *buf, size_t count){
     ssize_t ecrit = 0;
     ecrit = send(c->socket[1], buf, count,0);
-   	ERROR(error, "conduct_socket.c : conduct_write : send ");
+   	ERROR(ecrit, "conduct_socket.c : conduct_write : send ");
     return ecrit;
 }
 

@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall
-EXEC = conduct_julia test_fork test_thread test_nomme test_fork_nomme test_thread_nomme client serveur test
+EXEC = conduct_julia test_fork test_thread test_nomme test_fork_nomme test_thread_nomme client serveur test socket_julia tube_julia
 
 all: $(EXEC)
 
@@ -12,6 +12,12 @@ conduct: conduct.o
 
 conduct_julia: conduct.o
 	$(CC) -o conduct_julia -g -O3 -ffast-math -Wall -pthread `pkg-config --cflags gtk+-3.0` julia.c conduct.c `pkg-config --libs gtk+-3.0` -lm
+
+socket_julia:
+	$(CC) -o socket_julia -g -O3 -ffast-math -Wall -pthread `pkg-config --cflags gtk+-3.0` julia.c conduct_socket.c `pkg-config --libs gtk+-3.0` -lm
+
+tube_julia:
+		$(CC) -o tube_julia -g -O3 -ffast-math -Wall -pthread `pkg-config --cflags gtk+-3.0` julia.c conduct_tube.c `pkg-config --libs gtk+-3.0` -lm
 
 serveur: serveur.o conduct.o
 	$(CC) -o serveur conduct.o serveur.o -pthread
