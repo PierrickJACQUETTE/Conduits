@@ -8,11 +8,6 @@ extensions :
 
 	- gestion erreur pour liberer la memoire et return null (et errno) (cf extension dans le sujet)
 
-	- test de performance : graphique => Pierrick
-		figure possible, temps, nombre de threads
-		à effectuer sur julia en faisant une moyenne sur plusieurs essais
-		comparaison entre tube, socket et conduct
-
 Fait :
 
 - 90% du  projet minimal
@@ -20,3 +15,4 @@ Fait :
 - exemple d'utilisation
 - makefile
 - lecture et ecriture par lots
+- graphique

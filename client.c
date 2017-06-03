@@ -1,4 +1,4 @@
-#include "conduct.h"
+#include "conduct_tube.h"
 
 int main(int argc, char const *argv[]) {
     struct conduct* client = conduct_open("serveur");
@@ -8,7 +8,8 @@ int main(int argc, char const *argv[]) {
     char buff[30];
     int nbEcrit, i;
     for(i=1; i<argc; i++){
-        strncpy(buff, argv[i], 29);
+        strncpy(buff, argv[i], 28);
+        buff[29] = ' ';
 		buff[30] = '\0';
         nbEcrit = conduct_write(client, buff, 30);
         if(nbEcrit < 0){
