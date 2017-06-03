@@ -112,9 +112,9 @@ struct conduct *conduct_open(const char *name){
         ERROR(fd, "conduct.c : conduct_open : open");
         free(s);
         int error = fstat(fd, &st);
-        ERROR_FD(error, "conduct.c : conduct_open : fstat");
+        ERROR_FD(error, "conduct.c : conduct_open : fstat", fd);
         struct conduct* cond = mmap(NULL, sizeof(struct conduct), PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        ERROR_MEMOIRE_FD(cond, "conduct.c : conduct_open : mmap conduct");
+        ERROR_MEMOIRE_FD(cond, "conduct.c : conduct_open : mmap conduct",fd);
         error = close(fd);
         ERROR_MAP(error, "conduct.c : conduct_open : close", cond);
         return cond;
