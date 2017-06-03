@@ -15,10 +15,18 @@
 #include <sys/uio.h>
 
 #define ERROR(a,str) if (a < 0 && errno != 0) {perror(str); exit(EXIT_FAILURE);}
+#define ERROR_FREE(a,str,buff, cond) if (a < 0 && errno != 0) {free(buff); conduct_close(cond); perror(str); exit(EXIT_FAILURE);}
+#define ERROR_MAP(a,str,cond) if (a < 0 && errno != 0) {conduct_close(cond); perror(str); exit(EXIT_FAILURE);}
+#define ERROR_FD(a,str,fd) if (a < 0 && errno != 0) {close(fd); perror(str); exit(EXIT_FAILURE);}
+#define ERROR_FD_MAP(a,str,fd,cond) if (a < 0 && errno != 0) {close(fd); conduct_close(cond); perror(str); exit(EXIT_FAILURE);}
 #define ERROR_ARGUMENT_I(a,str) if(a<1){errno = EINVAL; perror(str); exit(EXIT_FAILURE);}
 #define ERROR_ARGUMENT_S(a,str) if(a == NULL){errno = EINVAL; perror(str); exit(EXIT_FAILURE);}
-#define ERROR_MEMOIRE(a, str) if(a == NULL && errno != 0){perror(str); exit(EXIT_FAILURE);}
-#define ERROR_THREAD(a,str) if(a !=0){perror(str); exit(EXIT_FAILURE);}
+#define ERROR_MEMOIRE(a,str) if(a == NULL && errno != 0){perror(str); exit(EXIT_FAILURE);}
+#define ERROR_MEMOIRE_FREE(a,str,buff,cond) if(a == NULL && errno != 0){free(buff); conduct_close(cond); perror(str); exit(EXIT_FAILURE);}
+#define ERROR_MEMOIRE_FD(a,str,fd) if(a == NULL && errno != 0){close(fd); perror(str); exit(EXIT_FAILURE);}
+#define ERROR_MEMOIRE_MAP(a,str,cond) if(a == NULL && errno != 0){conduct_close(cond); perror(str); exit(EXIT_FAILURE);}
+#define ERROR_THREAD(a,str,cond) if(a !=0){conduct_close(cond); perror(str); exit(EXIT_FAILURE);}
+#define ERROR_THREAD_MAP(a,str,cond) if(a !=0){conduct_close(cond); perror(str); exit(EXIT_FAILURE);}
 #define TMP "/tmp/"
 
 struct conduct {
