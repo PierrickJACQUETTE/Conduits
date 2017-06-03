@@ -6,7 +6,7 @@ int main(int argc, char const *argv[]) {
     if(serveur==NULL){
         printf("NULL\n");
     }
-    int size = 10;
+    int size = 10, i;
 
     char *str0 = malloc(sizeof(char)*size);
     memset(str0, 0, size+1);
@@ -41,11 +41,10 @@ int main(int argc, char const *argv[]) {
 
     conduct_readv(client, iov2, 2);
 
-    write(1,reponse,strlen(reponse));
-    write(1, "\n", 1);
-
-    write(1,reponse2,strlen(reponse2));
-    write(1, "\n", 1);
+    for (i = 0; i < 2; i++){
+        write(1, (char *) iov2[i].iov_base, iov2[i].iov_len);
+        write(1, "\n", 1);
+    }
 
     conduct_close(client);
     conduct_destroy(serveur);

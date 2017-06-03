@@ -215,18 +215,10 @@ int conduct_write_eof(struct conduct *c){
 }
 
 ssize_t conduct_readv(struct conduct *c, const struct iovec *iov, int iovcnt){
-    int res = 0, i;
-    for(i = 0; i < iovcnt; i++){
-        res += conduct_read(c, iov[i].iov_base, iov[i].iov_len);
-    }
-    return res;
-}
 
-ssize_t conduct_writev(struct conduct *c, const struct iovec *iov, int iovcnt){
-
-    ERROR_ARGUMENT_S(c, "c doit etre non null");
-    ERROR_ARGUMENT_S(iov, "c doit etre non null");
-    ERROR_ARGUMENT_I(iovcnt, "iovcnt doit etre >0");
+    ERROR_ARGUMENT_S(c, "conduct_readv : c doit etre non null");
+    ERROR_ARGUMENT_S(iov, "conduct_readv : iov doit etre non null");
+    ERROR_ARGUMENT_I(iovcnt, "conduct_readv : iovcnt doit etre >0");
 
     int res = 0, i, error;
     void* rc;
@@ -234,16 +226,46 @@ ssize_t conduct_writev(struct conduct *c, const struct iovec *iov, int iovcnt){
         res += iov[i].iov_len;
     }
 
-    char* s = malloc(res*sizeof(char));
-    ERROR_MEMOIRE(s, "conduct.c : conduct_writev : malloc");
-    rc = memset(s, 0, res+1);
+    char* buff = malloc(res*sizeof(char));
+    ERROR_MEMOIRE(buff, "conduct.c : conduct_readv : malloc");
+    rc = memset(buff, 0, res+1);
+    ERROR_MEMOIRE(rc, "conduct.c : conduct_readv : memset");
+
+    error = conduct_read(c, buff, res+1);
+    ERROR(error, "conduct.c : conduct_readv : conduct_read");
+
+    res = 0;
+    for(i = 0; i < iovcnt; i++){
+        rc = memcpy(iov[i].iov_base, buff+res, iov[i].iov_len);
+        ERROR_MEMOIRE(rc, "conduct.c : conduct_readv : memcpy");
+        res += iov[i].iov_len;
+    }
+
+    return res;
+}
+
+ssize_t conduct_writev(struct conduct *c, const struct iovec *iov, int iovcnt){
+
+    ERROR_ARGUMENT_S(c, "conduct_writev : c doit etre non null");
+    ERROR_ARGUMENT_S(iov, "conduct_writev : iov doit etre non null");
+    ERROR_ARGUMENT_I(iovcnt, "conduct_writev : iovcnt doit etre >0");
+
+    int res = 0, i, error;
+    void* rc;
+    for(i = 0; i < iovcnt; i++){
+        res += iov[i].iov_len;
+    }
+
+    char* buff = malloc(res*sizeof(char));
+    ERROR_MEMOIRE(buff, "conduct.c : conduct_writev : malloc");
+    rc = memset(buff, 0, res+1);
     ERROR_MEMOIRE(rc, "conduct.c : conduct_writev : memset");
 
     for(i = 0; i < iovcnt; i++){
-        error = sprintf(s, "%s%s", s, (char*)iov[i].iov_base);
+        error = sprintf(buff, "%s%s", buff, (char*)iov[i].iov_base);
         ERROR(error, "conduct.c : conduct_writev : sprintf");
     }
 
-    res = conduct_write(c, s, strlen(s));
+    res = conduct_write(c, buff, strlen(buff));
     return res;
 }
