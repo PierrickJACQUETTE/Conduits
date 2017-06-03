@@ -224,13 +224,20 @@ ssize_t conduct_readv(struct conduct *c, const struct iovec *iov, int iovcnt){
 
 ssize_t conduct_writev(struct conduct *c, const struct iovec *iov, int iovcnt){
 
+    ERROR_ARGUMENT_S(c, "c doit etre non null");
+    ERROR_ARGUMENT_S(iov, "c doit etre non null");
+    ERROR_ARGUMENT_I(iovcnt, "iovcnt doit etre >0");
+
     int res = 0, i, error;
+    void* rc;
     for(i = 0; i < iovcnt; i++){
         res += iov[i].iov_len;
     }
 
     char* s = malloc(res*sizeof(char));
     ERROR_MEMOIRE(s, "conduct.c : conduct_writev : malloc");
+    rc = memset(s, 0, res+1);
+    ERROR_MEMOIRE(rc, "conduct.c : conduct_writev : memset");
 
     for(i = 0; i < iovcnt; i++){
         error = sprintf(s, "%s%s", s, (char*)iov[i].iov_base);

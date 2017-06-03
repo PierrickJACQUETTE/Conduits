@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall
-EXEC = conduct_julia test_fork test_thread test_nomme test_fork_nomme test_thread_nomme client serveur test socket_julia tube_julia
+EXEC = conduct_julia test_fork test_thread test_nomme test_fork_nomme test_thread_nomme client serveur test_lots socket_julia tube_julia
 
 all: $(EXEC)
 
@@ -37,8 +37,8 @@ test_thread: conduct.o test_thread.o
 test_nomme: conduct.o test_nomme.o
 	$(CC) -o test_nomme conduct.o test_nomme.o -pthread
 
-test: conduct.o test.o
-	$(CC) -o test conduct.o test.o -pthread
+test_lots: conduct.o test_lots.o
+	$(CC) -o test_lots conduct.o test_lots.o -pthread
 
 client.o: client.c conduct.h
 	$(CC) -o client.o -c client.c -Wall
@@ -64,8 +64,8 @@ test_thread.o: test_thread.c conduct.h
 test_nomme.o: test_nomme.c conduct.h
 	$(CC) -o test_nomme.o -c test_nomme.c -Wall
 
-test.o: test.c conduct.h
-	$(CC) -o test.o -c test.c -Wall
+test.o: test_lots.c conduct.h
+	$(CC) -o test_lots.o -c test_lots.c -Wall
 
 clean:
 	rm -rf *.o *.h.gch
