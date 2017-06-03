@@ -1,16 +1,10 @@
-A Faire :
-
-pour le projet minimal :
-
-	- test sur d'autres systemes dans le sujet ils disent : "Sur un Raspberry Pi ou un BeagleBone, par exemple."
-
-extensions :
+A Faire extensions :
 
 	- gestion erreur pour liberer la memoire et return null (et errno) (cf extension dans le sujet)
 
 Fait :
 
-- 90% du  projet minimal
+- projet minimal
 - faire le projet en utilisant les tubes et les sockets
 - exemple d'utilisation
 - makefile
