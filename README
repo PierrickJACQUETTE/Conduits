@@ -1,4 +1,4 @@
-Indication pour le compiler et exécution : 
+Indication pour le compiler et exécution :
 
 Un makefile a était crée pour ce projet
 Dans un terminal taper "make" à la racine du projet
@@ -9,7 +9,7 @@ conduct_julia
     permet de tester le conduit anonyme et dessine des ensembles de julia.
 
 test_fork
-    permet de tester un fork anonyme, 
+    permet de tester un fork anonyme,
 	le conduct est créé : le fils écrit, le pere ecrit, le père lit, le père lit.
 	destruit le conduit
 
@@ -20,7 +20,7 @@ test_fork_nomme
 
 test_nomme
     permet de tester un conduit nommé,
-    Deux instances du conduit : 
+    Deux instances du conduit :
         serveur : crée le conduit et le client : ouvert le conduit,
         serveur : écrit dans le conduit
         client : écrit, lit deux fois dans le conduit puis ferme le conduit
@@ -28,7 +28,7 @@ test_nomme
 
 test_thread
     permet de tester un conduit anonyme avec des 2 threads,
-    le conduit est crée, 
+    le conduit est crée,
 	l’un écrit dans le conduit et l’autre écrit, lit deux fois puis détruit le conduit.
 
 test_thread_nomme
@@ -36,7 +36,7 @@ test_thread_nomme
     l’un crée le conduit, écrit dans le conduit,
     l’autre l’ouvre, écrit, lit deux fois puis détruit le conduit.
 
-test
+test_lots
     permet de tester les fonctions writev et readv
 
 client/serveur
